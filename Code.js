@@ -35,9 +35,10 @@ function getEvents() {
       dateString = Utilities.formatDate(row[2], timezone, "yyyy-MM-dd");
     }
 
+    // Convert time to 12-hour format with AM/PM
     let timeString = "";
     if (row[3] instanceof Date) {
-      timeString = Utilities.formatDate(row[3], timezone, "HH:mm");
+      timeString = Utilities.formatDate(row[3], timezone, "hh:mm a"); // Changed from "HH:mm" to "hh:mm a"
     } else if (row[3]) {
       timeString = row[3].toString();
     }

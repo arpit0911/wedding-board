@@ -969,6 +969,83 @@
           right: -50px;
         }
       }
+      /* Coming Soon Placeholder */
+      .image-placeholder {
+        width: 100%;
+        min-height: 400px;
+        background: linear-gradient(135deg, #fff9f0 0%, #ffe9e0 100%);
+        border-radius: 20px;
+        margin-bottom: 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border: 3px dashed rgba(212, 165, 116, 0.3);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .image-placeholder::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(212, 165, 116, 0.05) 0%,
+          transparent 70%
+        );
+        animation: shimmer 3s infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: translate(-50%, -50%) rotate(0deg);
+        }
+        100% {
+          transform: translate(-50%, -50%) rotate(360deg);
+        }
+      }
+
+      .placeholder-icon {
+        font-size: 80px;
+        color: #d4a574;
+        margin-bottom: 20px;
+        opacity: 0.6;
+        animation: pulse 2s infinite;
+        z-index: 1;
+      }
+
+      .placeholder-text {
+        font-family: "Great Vibes", cursive;
+        font-size: 48px;
+        color: #b5876d;
+        margin-bottom: 10px;
+        z-index: 1;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+      }
+
+      .placeholder-subtext {
+        font-family: "Poppins", sans-serif;
+        font-size: 16px;
+        color: #8b7355;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        z-index: 1;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.6;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
     </style>
   </head>
 
@@ -1004,7 +1081,7 @@
         </div>
 
         <!-- Hashtag -->
-        <div class="wedding-hashtag">#TimeToGetMarried</div>
+        <div class="wedding-hashtag">#ForeverBegins</div>
       </div>
 
       <div class="row">
@@ -1177,20 +1254,35 @@
         const dayOfWeek = formattedDate.split(",")[0];
         const dateDetails = formattedDate.split(",").slice(1).join(",").trim();
 
+        // Smart Image Handling - Check if image URL is valid
         let imageHtml = "";
-        if (
+        const hasValidImage =
           event.imageUrl &&
-          event.imageUrl.trim() &&
-          !event.imageUrl.includes("[image-url]")
-        ) {
+          event.imageUrl.trim() !== "" &&
+          !event.imageUrl.includes("[image-url]");
+
+        if (hasValidImage) {
+          // Show actual image with click to expand and error handling
           imageHtml =
             '<div style="position: relative;">' +
             '<img src="' +
             event.imageUrl +
-            '" alt="' +
+            '" ' +
+            'alt="' +
             event.name +
-            '" class="hero-image" onclick="openImageModal(this.src)">' +
+            '" ' +
+            'class="hero-image" ' +
+            'onclick="openImageModal(this.src)" ' +
+            'onerror="this.parentElement.outerHTML = getPlaceholderHTML()">' +
             '<div class="image-expand-hint"><i class="bi bi-arrows-fullscreen"></i> Click to expand</div>' +
+            "</div>";
+        } else {
+          // Show "Coming Soon" placeholder
+          imageHtml =
+            '<div class="image-placeholder">' +
+            '<i class="bi bi-image placeholder-icon"></i>' +
+            '<div class="placeholder-text">Coming Soon</div>' +
+            '<div class="placeholder-subtext">Invitation card arriving soon!</div>' +
             "</div>";
         }
 
@@ -1290,6 +1382,17 @@
           '<i class="bi bi-map"></i> Get Directions' +
           "</button>" +
           "</div>";
+      }
+
+      // Helper function for placeholder HTML (for error handling)
+      function getPlaceholderHTML() {
+        return (
+          '<div class="image-placeholder">' +
+          '<i class="bi bi-image placeholder-icon"></i>' +
+          '<div class="placeholder-text">Coming Soon</div>' +
+          '<div class="placeholder-subtext">Invitation card arriving soon!</div>' +
+          "</div>"
+        );
       }
 
       // Modal functions - Add these new functions
