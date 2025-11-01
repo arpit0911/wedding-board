@@ -638,6 +638,148 @@
         position: static;
       }
     }
+
+    /* Image Preview Animation - Auto Scroll */
+    .hero-image {
+      width: 100%;
+      max-height: 400px;
+      object-fit: cover;
+      /* Changed from cover to contain */
+      object-position: top;
+      /* Start from top */
+      border-radius: 20px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s ease;
+      cursor: pointer;
+      /* Show it's clickable */
+      animation: imageScroll 15s ease-in-out infinite;
+    }
+
+    /* Auto-scroll animation */
+    @keyframes imageScroll {
+
+      0%,
+      100% {
+        object-position: top;
+      }
+
+      50% {
+        object-position: bottom;
+      }
+    }
+
+    .hero-image:hover {
+      transform: scale(1.02);
+      animation-play-state: paused;
+      /* Pause animation on hover */
+    }
+
+    /* Modal Styles */
+    .image-modal {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.95);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .image-modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-content-wrapper {
+      position: relative;
+      max-width: 90%;
+      max-height: 90vh;
+      animation: zoomIn 0.3s ease;
+    }
+
+    @keyframes zoomIn {
+      from {
+        transform: scale(0.7);
+        opacity: 0;
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .modal-image {
+      width: 100%;
+      height: auto;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 15px;
+      box-shadow: 0 20px 80px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: -50px;
+      right: 0;
+      color: #fff;
+      font-size: 40px;
+      font-weight: 300;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.1);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: rotate(90deg);
+    }
+
+    .image-expand-hint {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(212, 165, 116, 0.9);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      pointer-events: none;
+      animation: pulse 2s infinite;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .image-expand-hint i {
+      font-size: 14px;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .modal-close {
+        top: 10px;
+        right: 10px;
+      }
+
+      .modal-content-wrapper {
+        max-width: 95%;
+      }
+    }
   </style>
 </head>
 
@@ -793,86 +935,132 @@
       }, 300);
     }
 
-    function renderMainContent(index) {
-      const event = allEvents[index];
-      const mainContent = document.getElementById('mainContent');
+   function renderMainContent(index) {
+    const event = allEvents[index];
+    const mainContent = document.getElementById('mainContent');
 
-      const dateObj = new Date(event.date);
-      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      const formattedDate = dateObj.toLocaleDateString('en-US', options);
-      
-      const dayOfWeek = formattedDate.split(',')[0];
-      const dateDetails = formattedDate.split(',').slice(1).join(',').trim();
+    const dateObj = new Date(event.date);
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const formattedDate = dateObj.toLocaleDateString('en-US', options);
+    
+    const dayOfWeek = formattedDate.split(',')[0];
+    const dateDetails = formattedDate.split(',').slice(1).join(',').trim();
 
-      let imageHtml = '';
-      if (event.imageUrl && event.imageUrl.trim() && !event.imageUrl.includes('[image-url]')) {
-        imageHtml = '<img src="' + event.imageUrl + '" alt="' + event.name + '" class="hero-image">';
-      }
-
-      const icon = getEventIcon(event.name);
-      const countdown = getCountdown(event.date + ' ' + event.time);
-
-      let countdownHtml = '';
-      if (countdown.days >= 0) {
-        countdownHtml = '<div class="countdown-container" id="countdown-' + index + '">' +
-          '<div class="countdown-box">' +
-            '<div class="countdown-number" id="days-' + index + '">' + countdown.days + '</div>' +
-            '<div class="countdown-label">Days</div>' +
-          '</div>' +
-          '<div class="countdown-box">' +
-            '<div class="countdown-number" id="hours-' + index + '">' + countdown.hours + '</div>' +
-            '<div class="countdown-label">Hours</div>' +
-          '</div>' +
-          '<div class="countdown-box">' +
-            '<div class="countdown-number" id="minutes-' + index + '">' + countdown.minutes + '</div>' +
-            '<div class="countdown-label">Minutes</div>' +
-          '</div>' +
-          '<div class="countdown-box">' +
-            '<div class="countdown-number" id="seconds-' + index + '">' + countdown.seconds + '</div>' +
-            '<div class="countdown-label">Seconds</div>' +
-          '</div>' +
-        '</div>';
-      }
-
-      mainContent.innerHTML = imageHtml +
-        '<div class="invitation-badge"><i class="bi bi-envelope-heart"></i> You\'re invited to</div>' +
-        '<h1 class="hero-title">' + event.name + '</h1>' +
-        countdownHtml +
-        '<div class="divider"></div>' +
-        '<div class="event-details">' +
-          '<div class="detail-box">' +
-            '<i class="bi bi-calendar-check detail-icon"></i>' +
-            '<div class="detail-label">Date</div>' +
-            '<div class="detail-value">' + dayOfWeek + '</div>' +
-            '<div class="detail-subvalue">' + dateDetails + '</div>' +
-          '</div>' +
-          '<div class="detail-box">' +
-            '<i class="bi bi-clock detail-icon"></i>' +
-            '<div class="detail-label">Time</div>' +
-            '<div class="detail-value">' + event.time + '</div>' +
-            '<div class="detail-subvalue">IST</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="location">' +
-          '<i class="bi bi-geo-alt-fill"></i>' +
-          '<span>' + event.location + '</span>' +
-        '</div>' +
-        '<p class="description">"' + event.description + '"</p>' +
-        '<div class="dress-code-section">' +
-          '<div class="dress-code-badge">' +
-            '<i class="bi bi-tag"></i>' + event.hashtag +
-          '</div>' +
-        '</div>' +
-        '<div class="divider"></div>' +
-        '<div>' +
-          '<button class="btn-custom" onclick="handleRSVP()">' +
-            '<i class="bi bi-check2-circle"></i> RSVP Now' +
-          '</button>' +
-          '<button class="btn-custom" onclick="openMaps()">' +
-            '<i class="bi bi-map"></i> Get Directions' +
-          '</button>' +
+    let imageHtml = '';
+    if (event.imageUrl && event.imageUrl.trim() && !event.imageUrl.includes('[image-url]')) {
+      imageHtml = '<div style="position: relative;">' +
+        '<img src="' + event.imageUrl + '" alt="' + event.name + '" class="hero-image" onclick="openImageModal(this.src)">' +
+        '<div class="image-expand-hint"><i class="bi bi-arrows-fullscreen"></i> Click to expand</div>' +
         '</div>';
     }
+
+    const icon = getEventIcon(event.name);
+    const countdown = getCountdown(event.date + ' ' + event.time);
+
+    let countdownHtml = '';
+    if (countdown.days >= 0) {
+      countdownHtml = '<div class="countdown-container" id="countdown-' + index + '">' +
+        '<div class="countdown-box">' +
+          '<div class="countdown-number" id="days-' + index + '">' + countdown.days + '</div>' +
+          '<div class="countdown-label">Days</div>' +
+        '</div>' +
+        '<div class="countdown-box">' +
+          '<div class="countdown-number" id="hours-' + index + '">' + countdown.hours + '</div>' +
+          '<div class="countdown-label">Hours</div>' +
+        '</div>' +
+        '<div class="countdown-box">' +
+          '<div class="countdown-number" id="minutes-' + index + '">' + countdown.minutes + '</div>' +
+          '<div class="countdown-label">Minutes</div>' +
+        '</div>' +
+        '<div class="countdown-box">' +
+          '<div class="countdown-number" id="seconds-' + index + '">' + countdown.seconds + '</div>' +
+          '<div class="countdown-label">Seconds</div>' +
+        '</div>' +
+      '</div>';
+    }
+
+    mainContent.innerHTML = imageHtml +
+      '<div class="invitation-badge"><i class="bi bi-envelope-heart"></i> You\'re invited to</div>' +
+      '<h1 class="hero-title">' + event.name + '</h1>' +
+      countdownHtml +
+      '<div class="divider"></div>' +
+      '<div class="event-details">' +
+        '<div class="detail-box">' +
+          '<i class="bi bi-calendar-check detail-icon"></i>' +
+          '<div class="detail-label">Date</div>' +
+          '<div class="detail-value">' + dayOfWeek + '</div>' +
+          '<div class="detail-subvalue">' + dateDetails + '</div>' +
+        '</div>' +
+        '<div class="detail-box">' +
+          '<i class="bi bi-clock detail-icon"></i>' +
+          '<div class="detail-label">Time</div>' +
+          '<div class="detail-value">' + event.time + '</div>' +
+          '<div class="detail-subvalue">IST</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="location">' +
+        '<i class="bi bi-geo-alt-fill"></i>' +
+        '<span>' + event.location + '</span>' +
+      '</div>' +
+      '<p class="description">"' + event.description + '"</p>' +
+      '<div class="dress-code-section">' +
+        '<div class="dress-code-badge">' +
+          '<i class="bi bi-tag"></i>' + event.hashtag +
+        '</div>' +
+      '</div>' +
+      '<div class="divider"></div>' +
+      '<div>' +
+        '<button class="btn-custom" onclick="handleRSVP()">' +
+          '<i class="bi bi-check2-circle"></i> RSVP Now' +
+        '</button>' +
+        '<button class="btn-custom" onclick="openMaps()">' +
+          '<i class="bi bi-map"></i> Get Directions' +
+        '</button>' +
+      '</div>';
+  }
+
+  // Modal functions - Add these new functions
+  function openImageModal(imageSrc) {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('imageModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'imageModal';
+      modal.className = 'image-modal';
+      modal.innerHTML = '<div class="modal-content-wrapper">' +
+        '<span class="modal-close" onclick="closeImageModal()">&times;</span>' +
+        '<img class="modal-image" id="modalImage" src="">' +
+      '</div>';
+      document.body.appendChild(modal);
+      
+      // Close modal when clicking outside image
+      modal.onclick = function(event) {
+        if (event.target === modal) {
+          closeImageModal();
+        }
+      };
+      
+      // Close modal with Escape key
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+          closeImageModal();
+        }
+      });
+    }
+    
+    // Set image source and show modal
+    document.getElementById('modalImage').src = imageSrc;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  }
+
+  function closeImageModal() {
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+      modal.classList.remove('active');
+      document.body.style.overflow = ''; // Restore scrolling
+    }
+  }
 
     function startCountdown() {
       setInterval(function() {
