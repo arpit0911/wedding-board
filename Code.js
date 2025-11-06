@@ -54,7 +54,7 @@ function getEvents() {
       order: row[7] || i,
       // dressCode: row[8] || 'Festive Attire',
       // eventColor: row[9] || '#d4a574',
-      hashtag: row[10] || "#RajatKiShaadi",
+      hashtag: row[8] || "#RajatKiShaadi",
     });
   }
 
