@@ -1126,12 +1126,12 @@
         }
       }
 
+      // NEW VERSION - Matches main countdown precision
       function getDaysUntil(dateString) {
         const eventDate = new Date(dateString);
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const diffTime = eventDate - today;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const now = new Date();
+        const diffTime = eventDate - now;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); // Changed to Math.floor
         return diffDays;
       }
 
